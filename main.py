@@ -1,8 +1,44 @@
-import streamlit as st
+# daily_pattern.py
 
-st.title('나의 첫 웹 서비스 만들기!!')
-name = st.text_input('이름을 입력해주세요 : ')
-menu = st.selectbox('가장 많이 쓰는 앱은? :', ['유튜브','인스타', '카톡'])
-time = st.slider('하루 사용 시간은?', 0, 12, 3)
-if st.button('나의 디지털 습관') : 
-  st.write(f'{name}님! {menu}를 {time}시간 사용 중이시군요. 균형 잡힌 사용이 중요해요!')')
+import datetime
+import statistics
+
+class LifestyleAnalyzer:
+    def __init__(self):
+        # 예시 데이터: 수면 시작 시간 (datetime.time 객체 리스트)
+        self.sleep_times = []
+        self.wake_times = []
+
+    def add_record(self, sleep_time: datetime.time, wake_time: datetime.time):
+        self.sleep_times.append(sleep_time)
+        self.wake_times.append(wake_time)
+
+    def average_time(self, time_list):
+        seconds = [t.hour * 3600 + t.minute * 60 for t in time_list]
+        avg_sec = int(statistics.mean(seconds))
+        return datetime.time(hour=avg_sec // 3600, minute=(avg_sec % 3600) // 60)
+
+    def analyze(self):
+        if len(self.sleep_times) < 3 or len(self.wake_times) < 3:
+            return "더 많은 데이터가 필요합니다."
+
+        avg_sleep = self.average_time(self.sleep_times)
+        avg_wake = self.average_time(self.wake_times)
+
+        return {
+            "추천 수면 시간": avg_sleep.strftime("%H:%M"),
+            "추천 기상 시간": avg_wake.strftime("%H:%M"),
+            "메시지": "이 시간에 맞춰 생활하면 보다 규칙적인 루틴을 만들 수 있습니다!"
+        }
+
+
+# 예제 실행
+if __name__ == "__main__":
+    analyzer = LifestyleAnalyzer()
+    analyzer.add_record(datetime.time(01, 30), datetime.time(09, 0))
+    analyzer.add_record(datetime.time(02, 00), datetime.time(08, 30))
+    analyzer.add_record(datetime.time(00, 45), datetime.time(07, 45))
+
+    result = analyzer.analyze()
+    print(result)
+
